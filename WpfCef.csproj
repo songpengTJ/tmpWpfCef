@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+    <Platforms>AnyCPU;x64</Platforms>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="cef.redist.x64" Version="107.1.5" />
+    <PackageReference Include="cef.redist.x86" Version="107.1.5" />
+    <PackageReference Include="cef.sdk" Version="107.1.5" />
+    <PackageReference Include="CefSharp.Common" Version="107.1.50" />
+    <PackageReference Include="CefSharp.Common.NETCore" Version="107.1.50" />
+    <PackageReference Include="CefSharp.OffScreen" Version="107.1.50" />
+    <PackageReference Include="CefSharp.Wpf" Version="107.1.50" />
+  </ItemGroup>
+
+</Project>
