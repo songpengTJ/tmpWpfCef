@@ -43,24 +43,7 @@ namespace WpfCef.Models
         {
             bool bInvoke = b != _IsSelected;
             _IsSelected = b;
-            /*
-            if (type == 0) {
-                Tool.pack.data.cust.FindAll(p => {
-                    return p.custcode.StartsWith(this.id);
-                }).ForEach(p => { 
-                    p.IsSelected = b;
-                    p.NotifyPropertyChanged("IsSelected");
-                });
 
-                Tool.pack.data.cars.FindAll(p => {
-                    return p.custcode.StartsWith(this.id);
-                }).ForEach(p => {
-                    p.IsSelected = b;
-                    p.NotifyPropertyChanged("IsSelected");
-                });
-
-            }
-            */
             if (Members != null && Members.Count > 0)
             {
                 for (int i = 0; i < Members.Count; i++)
