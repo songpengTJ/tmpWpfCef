@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Windows;
@@ -26,6 +27,7 @@ namespace WpfCef
             init();
         }
 
+        private TreeVM treevm = null;
         private void init() {
             Tool.parseJson();
             Tool.pack.data.cust = Tool.pack.data.cust.OrderBy(s => s.custcode).ToList();
@@ -41,6 +43,7 @@ namespace WpfCef
                 string parentid = p.qryParentId();
                 if (!dic.ContainsKey(parentid)) 
                     return;
+                if(p.carsize>0)
                 dic[parentid].Members.Add(p);
             });
 
@@ -55,7 +58,10 @@ namespace WpfCef
             list.Add(rootNode);
             trvFamilies.ItemsSource = list;
 
+            treevm = new TreeVM();
 
+            DataGridPos.DataContext = treevm;
+            //DataGridPos.ItemsSource = treevm.ListCars;
         }
 
         private void ExpandAll(ItemsControl items, bool expand)
@@ -85,4 +91,6 @@ namespace WpfCef
         }
 
     }
+
+
 }

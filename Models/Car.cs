@@ -12,6 +12,7 @@ namespace WpfCef.Models
         public string cretime { get; set; }
         public string custcode { get; set; }
         public string custname { get; set; }
+        public string jt809_flag { get; set; }
         public string jt809_color { get; set; }
         public string jt809_owers_id { get; set; }
         public string jt809_owers_name { get; set; }

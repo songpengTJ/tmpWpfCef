@@ -8,6 +8,11 @@
         xmlns:cefSharpWPF="clr-namespace:CefSharp.Wpf;assembly=CefSharp.Wpf"
         xmlns:self="clr-namespace:WpfCef.Models"
         Title="Tree" Height="450" Width="800">
+    
+    <Window.Resources>
+        
+    </Window.Resources>
+
     <Grid>
         <Grid.ColumnDefinitions>
             <!--Resources TreeView-->
@@ -18,7 +23,7 @@
 
         <TreeView Grid.Column="0" x:Name="trvFamilies" >
             <TreeView.Resources>
-                <HierarchicalDataTemplate DataType="{x:Type self:TreeItemBase}"  
+                <HierarchicalDataTemplate DataType="{x:Type self:Cust}"  
                                               ItemsSource="{Binding Members}"  >
                     <StackPanel Orientation="Horizontal" >
                         <CheckBox  IsChecked="{Binding IsSelected}"  />
@@ -26,6 +31,24 @@
                         <TextBlock Text="{Binding Title}" />
                     </StackPanel>
                 </HierarchicalDataTemplate>
+
+                <DataTemplate DataType="{x:Type self:Car}"  >
+                    <WrapPanel Orientation="Horizontal">
+                        <CheckBox  IsChecked="{Binding IsSelected}"  />
+                        <Image Source="{Binding ImageName}" Width="21" Height="21"  />
+                        <TextBlock Text="{Binding Title}" />
+                        <WrapPanel.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="轨迹回放" Command="{Binding MiCmdPlayTrack}" />
+                                <MenuItem Header="视频监控" Command="{Binding MiCmdVideoMonitor}" />
+                                <MenuItem Header="油耗查询" Command="{Binding MiCmdPlayOil}" />
+                                <MenuItem Header="指令下发" Command="{Binding MiCmdSendCommand}" />
+                                <Separator Height="5"/>
+                                <MenuItem Header="车辆信息" />
+                            </ContextMenu>
+                        </WrapPanel.ContextMenu>
+                    </WrapPanel>
+                </DataTemplate>
             </TreeView.Resources>
         </TreeView>
         
@@ -39,15 +62,118 @@
                 <RowDefinition Height="300"></RowDefinition>
             </Grid.RowDefinitions>
 
+
+
             
-            
-            <GridSplitter ResizeDirection="Rows" Height="5"  ShowsPreview="True"/>
             <GridSplitter Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Center" ShowsPreview="True"  Height="5" />
 
-            <DataGrid Grid.Row="2">
+            <DataGrid x:Name="DataGridPos"  Grid.Row="2" ItemsSource="{Binding ListCars, IsAsync=True}" 
+                              AutoGenerateColumns="False" 
+                              CanUserAddRows="False" 
+                              CanUserDeleteRows="False" 
+                              CanUserResizeRows="False" 
+                              
+                              IsReadOnly="True"
+                              SelectionMode="Single" 
+                              
+                              VirtualizingStackPanel.IsVirtualizing="True" 
+                              EnableRowVirtualization="True"
+                              EnableColumnVirtualization="True" 
+                              MaxWidth="2560" 
+                              MaxHeight="1600"  
+                              VirtualizingStackPanel.VirtualizationMode="Recycling"   
+                              VirtualizingPanel.IsVirtualizingWhenGrouping="True"
+                              >
+
+                <DataGrid.Resources>
+
+                    <local:BoolToVisibilityConverter 
+            x:Key="BoolToVisibilityConverter"
+            />
+                    <Style TargetType="{x:Type DataGridCell}">
+                        <Style.Triggers>
+                            <Trigger Property="DataGridCell.IsSelected" Value="True">
+                                <Setter Property="Background"  Value="#1782ff"  />
+                                <Setter Property="Foreground"  Value="White" />
+                                <Setter Property="BorderBrush" Value="Black"  />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                    
+                    <Style TargetType="{x:Type DataGridRow}">
+                        <Style.Triggers>
+                            <!-- 
+                            <Trigger Property="DataGridRow.Visibility" Value="Hidden">
+                                <Setter Property="Height" Value="0" />
+                            </Trigger>
+                            <Trigger Property="DataGridRow.Visibility" Value="Visible">
+                                <Setter Property="Height" Value="30" />
+                            </Trigger>
+                            -->
+
+                            <!-- 
+                            <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding IsSelected}" Value="False">
+                                <Setter Property="Visibility" Value="Hidden" />
+                            </DataTrigger>
+                            -->
+                        </Style.Triggers>                    
+                    </Style>
+                    
+                </DataGrid.Resources>
+
+                <!-- 
+                <DataGrid.RowStyle>                    
+                    <Style TargetType="{x:Type DataGridRow}">
+                        <Setter Property="Visibility" Value="{Binding IsSelected, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                    </Style>
+                </DataGrid.RowStyle>
+                -->
                 
+                <DataGrid.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="编辑列属性"  Command="{Binding CmdEditCloumns}" CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Parent.PlacementTarget}" />
+                        <MenuItem Header="导出CSV"     Command="{Binding CmdExport}"      CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=Parent.PlacementTarget}" />
+                    </ContextMenu>
+                </DataGrid.ContextMenu>
+
+                <DataGrid.VerticalGridLinesBrush>
+                    <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.MenuBarColorKey}}"/>
+                </DataGrid.VerticalGridLinesBrush>
+                <DataGrid.HorizontalGridLinesBrush>
+                    <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.MenuBarColorKey}}"/>
+                </DataGrid.HorizontalGridLinesBrush>
+                <DataGrid.Columns>
+                    <DataGridTextColumn Width="80"   Header="车牌号"   Binding="{Binding vid}"  />
+                    <DataGridTextColumn Width="80"   Header="自编号"   Binding="{Binding vid2}"  />
+                    <DataGridTextColumn Width="120"  Header="刷新时间" Binding="{Binding rt.rpttime2 ,StringFormat='yy-MM-dd HH:mm:ss' }"   />
+                    <DataGridTextColumn Width="300"  Header="地址"     Binding="{Binding rt.addr}"      />
+                    <DataGridTextColumn Width="40"   Header="时速"     Binding="{Binding rt.speed}"       />
+                    <DataGridTextColumn Width="40"   Header="方向"     Binding="{Binding rt.directionText}"     />
+                    <DataGridTextColumn Width="40"   Header="定位"     Binding="{Binding rt.av}"          />
+                    <DataGridTextColumn Width="40"   Header="ACC"      Binding="{Binding rt.acc}"         />
+                    <DataGridTextColumn Width="120"  Header="停车时长" Binding="{Binding rt.speedText2 }"     />
+                    <DataGridTextColumn Width="60"   Header="当日里程" Binding="{Binding rt.mileToday}"   />
+                    <DataGridTextColumn Width="80"   Header="总里程"   Binding="{Binding rt.mileage}"    />
+                    <DataGridTextColumn Width="80"   Header="报警"     Binding="{Binding rt.alarmText}"     />
+                    <DataGridTextColumn Width="40"   Header="油量"     Binding="{Binding rt.oil}"    />
+                    <DataGridTextColumn Width="40"   Header="海拔"     Binding="{Binding rt.height}"  />
+                    <DataGridTextColumn Width="80"   Header="温度"          />
+                    <DataGridTextColumn Width="40"   Header="搅拌罐"   Binding="{Binding rt.dump}"     />
+                    <DataGridTextColumn Width="80"   Header="纬度"     Binding="{Binding rt.jpy}"     />
+                    <DataGridTextColumn Width="80"   Header="经度"     Binding="{Binding rt.jpx}"     />
+                    <DataGridTextColumn Width="80"   Header="油量AD值"      />
+                    <DataGridTextColumn Width="120"  Header="接收时间" Binding="{Binding rt.cretime2 ,StringFormat='yy-MM-dd HH:mm:ss'}"   />
+                    <DataGridTextColumn Width="200"  Header="上报号"   Binding="{Binding rptcode}"     />
+
+                    <DataGridTextColumn Width="100"  Header="驾驶员姓名" Binding="{Binding rt.jsy}"     />
+                    <DataGridTextColumn Width="200"  Header="从业资格证" Binding="{Binding rt.jsyid}"   />
+                    <DataGridTextColumn Width="100"  Header="XY" Binding="{Binding rt.xy}"   />
+                </DataGrid.Columns>
             </DataGrid>
-            
+
         </Grid>
 
     </Grid>
