@@ -30,38 +30,32 @@ namespace WpfCef
         private TreeVM treevm = null;
         private void init() {
             Tool.parseJson();
-            Tool.pack.data.cust = Tool.pack.data.cust.OrderBy(s => s.custcode).ToList();
-            TreeItemBase rootNode = Tool.pack.data.cust.First();
-            var dic = new Dictionary<string, TreeItemBase>();
-            Tool.pack.data.cust.ForEach(delegate (Cust p) {
-                string cc = p.custcode;
-                dic[cc] = p;
-                p.carsize = Tool.pack.data.cars.FindAll(p => { return p.custcode.StartsWith(cc); }).Count();
-            });
-
-            Tool.pack.data.cust.ForEach(delegate (Cust p) {
-                string parentid = p.qryParentId();
-                if (!dic.ContainsKey(parentid)) 
-                    return;
-                if(p.carsize>0)
-                dic[parentid].Members.Add(p);
-            });
-
-            Tool.pack.data.cars.ForEach(delegate (Car p) {
-                string parentid = p.custcode;
-                if (!dic.ContainsKey(parentid))
-                    return;
-                dic[parentid].Members.Add(p);
-            });
-
-            ObservableCollection<TreeItemBase> list = new ObservableCollection<TreeItemBase>();
-            list.Add(rootNode);
-            trvFamilies.ItemsSource = list;
-
             treevm = new TreeVM();
 
-            DataGridPos.DataContext = treevm;
-            //DataGridPos.ItemsSource = treevm.ListCars;
+            treevm.PageDG = this.DataGridPos;
+            treevm.PageTV = this.trvFamilies;
+            this.DataContext = treevm;
+
+            this.Loaded += Tree_Loaded;
+        }
+
+        private void Tree_Loaded(object sender, RoutedEventArgs e)
+        {
+            CollapseAll(this.trvFamilies.ItemContainerGenerator, true, false);
+            CollapseAll(this.trvFamilies.ItemContainerGenerator, false, true);
+        }
+
+        private void CollapseAll(ItemContainerGenerator containerGenerator, bool IsGoon, bool IsExpanded)
+        {
+            foreach (object childItem in containerGenerator.Items)
+            {
+                TreeViewItem tvi = containerGenerator.ContainerFromItem(childItem) as TreeViewItem;
+                if (tvi == null) continue;
+                tvi.IsExpanded = IsExpanded;
+                tvi.IsSelected = IsExpanded;
+                if (IsGoon)
+                    CollapseAll(tvi.ItemContainerGenerator, IsGoon, IsExpanded);
+            }
         }
 
         private void ExpandAll(ItemsControl items, bool expand)
@@ -90,6 +84,11 @@ namespace WpfCef
             }
         }
 
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            CollapseAll(trvFamilies.ItemContainerGenerator, true, false);
+            CollapseAll(trvFamilies.ItemContainerGenerator, false, true);
+        }
     }
 
 

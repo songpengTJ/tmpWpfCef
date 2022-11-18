@@ -6,13 +6,10 @@
         xmlns:local="clr-namespace:WpfCef"
         mc:Ignorable="d"
         xmlns:cefSharpWPF="clr-namespace:CefSharp.Wpf;assembly=CefSharp.Wpf"
-        xmlns:self="clr-namespace:WpfCef.Models"
+        xmlns:self="clr-namespace:WpfCef.Models" 
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity" d:DataContext="{d:DesignInstance Type=local:TreeVM}"
         Title="Tree" Height="450" Width="800">
     
-    <Window.Resources>
-        
-    </Window.Resources>
-
     <Grid>
         <Grid.ColumnDefinitions>
             <!--Resources TreeView-->
@@ -21,10 +18,16 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <TreeView Grid.Column="0" x:Name="trvFamilies" >
+        <TreeView Grid.Column="0" x:Name="trvFamilies" 
+                  ItemsSource="{Binding listTreeNodes}" 
+                  SelectedValuePath="id"
+                 >
+            <i:Interaction.Behaviors>
+                <local:BindableSelectedItemBehavior SelectedItem="{Binding SelectedTreeItem}" />
+            </i:Interaction.Behaviors>
+            
             <TreeView.Resources>
-                <HierarchicalDataTemplate DataType="{x:Type self:Cust}"  
-                                              ItemsSource="{Binding Members}"  >
+                <HierarchicalDataTemplate DataType="{x:Type self:Cust}" ItemsSource="{Binding Members}" >
                     <StackPanel Orientation="Horizontal" >
                         <CheckBox  IsChecked="{Binding IsSelected}"  />
                         <Image Source="{Binding ImageName}" Width="21" Height="21"  />
@@ -62,34 +65,47 @@
                 <RowDefinition Height="300"></RowDefinition>
             </Grid.RowDefinitions>
 
+            <StackPanel Grid.Row="1">
+
+                <TextBlock Margin="10">SelectedValuePath:</TextBlock>
+                <TextBlock Margin="10,0,0,0" 
+           Text="{Binding ElementName=trvFamilies, 
+                          Path=SelectedValuePath}"
+           Foreground="Blue"/>
+               
+                <Button Content="INIT TV" Click="Button_Click" /> 
+
+                <TextBlock Margin="10">SelectedValue:</TextBlock>
+                <TextBlock Margin="10,0,0,0" 
+           Text="{Binding ElementName=trvFamilies, 
+                          Path=SelectedValue }"
+           Foreground="Blue"/>
+
+            </StackPanel>
 
 
-            
             <GridSplitter Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Center" ShowsPreview="True"  Height="5" />
 
-            <DataGrid x:Name="DataGridPos"  Grid.Row="2" ItemsSource="{Binding ListCars, IsAsync=True}" 
-                              AutoGenerateColumns="False" 
-                              CanUserAddRows="False" 
-                              CanUserDeleteRows="False" 
-                              CanUserResizeRows="False" 
-                              
-                              IsReadOnly="True"
-                              SelectionMode="Single" 
-                              
-                              VirtualizingStackPanel.IsVirtualizing="True" 
-                              EnableRowVirtualization="True"
-                              EnableColumnVirtualization="True" 
-                              MaxWidth="2560" 
-                              MaxHeight="1600"  
-                              VirtualizingStackPanel.VirtualizationMode="Recycling"   
-                              VirtualizingPanel.IsVirtualizingWhenGrouping="True"
-                              >
-
+            <DataGrid x:Name="DataGridPos"  Grid.Row="2" 
+                      ItemsSource="{Binding ListCars, IsAsync=True}" 
+                      AutoGenerateColumns="False" 
+                      CanUserAddRows="False" 
+                      CanUserDeleteRows="False" 
+                      CanUserResizeRows="False" 
+                      IsReadOnly="True"
+                      SelectionMode="Single" 
+                      VirtualizingStackPanel.IsVirtualizing="True" 
+                      EnableRowVirtualization="True"
+                      EnableColumnVirtualization="True" 
+                      MaxWidth="2560" 
+                      MaxHeight="1600"
+                      VirtualizingStackPanel.VirtualizationMode="Recycling"   
+                      VirtualizingPanel.IsVirtualizingWhenGrouping="True"
+                      
+                      SelectedItem="{Binding Path=SelectedRTGridCar, Mode=TwoWay}"
+                >
                 <DataGrid.Resources>
-
-                    <local:BoolToVisibilityConverter 
-            x:Key="BoolToVisibilityConverter"
-            />
+                    
                     <Style TargetType="{x:Type DataGridCell}">
                         <Style.Triggers>
                             <Trigger Property="DataGridCell.IsSelected" Value="True">
@@ -99,38 +115,7 @@
                             </Trigger>
                         </Style.Triggers>
                     </Style>
-                    
-                    <Style TargetType="{x:Type DataGridRow}">
-                        <Style.Triggers>
-                            <!-- 
-                            <Trigger Property="DataGridRow.Visibility" Value="Hidden">
-                                <Setter Property="Height" Value="0" />
-                            </Trigger>
-                            <Trigger Property="DataGridRow.Visibility" Value="Visible">
-                                <Setter Property="Height" Value="30" />
-                            </Trigger>
-                            -->
-
-                            <!-- 
-                            <DataTrigger Binding="{Binding IsSelected}" Value="True">
-                                <Setter Property="Visibility" Value="Visible" />
-                            </DataTrigger>
-                            <DataTrigger Binding="{Binding IsSelected}" Value="False">
-                                <Setter Property="Visibility" Value="Hidden" />
-                            </DataTrigger>
-                            -->
-                        </Style.Triggers>                    
-                    </Style>
-                    
                 </DataGrid.Resources>
-
-                <!-- 
-                <DataGrid.RowStyle>                    
-                    <Style TargetType="{x:Type DataGridRow}">
-                        <Setter Property="Visibility" Value="{Binding IsSelected, Converter={StaticResource BoolToVisibilityConverter}}"/>
-                    </Style>
-                </DataGrid.RowStyle>
-                -->
                 
                 <DataGrid.ContextMenu>
                     <ContextMenu>
@@ -167,7 +152,6 @@
                     <DataGridTextColumn Width="80"   Header="油量AD值"      />
                     <DataGridTextColumn Width="120"  Header="接收时间" Binding="{Binding rt.cretime2 ,StringFormat='yy-MM-dd HH:mm:ss'}"   />
                     <DataGridTextColumn Width="200"  Header="上报号"   Binding="{Binding rptcode}"     />
-
                     <DataGridTextColumn Width="100"  Header="驾驶员姓名" Binding="{Binding rt.jsy}"     />
                     <DataGridTextColumn Width="200"  Header="从业资格证" Binding="{Binding rt.jsyid}"   />
                     <DataGridTextColumn Width="100"  Header="XY" Binding="{Binding rt.xy}"   />

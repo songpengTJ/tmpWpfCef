@@ -16,6 +16,7 @@
     <PackageReference Include="CefSharp.Common.NETCore" Version="107.1.90" />
     <PackageReference Include="CefSharp.OffScreen" Version="107.1.90" />
     <PackageReference Include="CefSharp.Wpf" Version="107.1.90" />
+    <PackageReference Include="MvvmLightLibs" Version="5.4.1.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.2-beta3" />
   </ItemGroup>
 

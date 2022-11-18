@@ -31,9 +31,7 @@ namespace WpfCef.Models
 
         public ObservableCollection<TreeItemBase> Members { get; set; }
 
-        private bool _IsSelected = false;
-
-
+        private bool _IsSelected = true;
         public bool IsSelected
         {
             get => _IsSelected;
