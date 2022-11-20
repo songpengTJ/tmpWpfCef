@@ -12,6 +12,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 using WpfCef.Models;
 
 namespace WpfCef
@@ -37,12 +38,12 @@ namespace WpfCef
             this.DataContext = treevm;
 
             this.Loaded += Tree_Loaded;
+            
         }
 
         private void Tree_Loaded(object sender, RoutedEventArgs e)
         {
-            CollapseAll(this.trvFamilies.ItemContainerGenerator, true, false);
-            CollapseAll(this.trvFamilies.ItemContainerGenerator, false, true);
+            c(this.trvFamilies.ItemContainerGenerator, true);
         }
 
         private void CollapseAll(ItemContainerGenerator containerGenerator, bool IsGoon, bool IsExpanded)
@@ -86,10 +87,30 @@ namespace WpfCef
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            CollapseAll(trvFamilies.ItemContainerGenerator, true, false);
-            CollapseAll(trvFamilies.ItemContainerGenerator, false, true);
+            c(this.trvFamilies.ItemContainerGenerator,true);
+            MessageBox.Show("123456");
         }
+
+        private void c(ItemContainerGenerator icg, bool expand) { 
+            if(icg == null) return;   
+            foreach (object item in icg.Items)
+            {
+                TreeViewItem tvi = icg.ContainerFromItem(item) as TreeViewItem;
+                if (tvi == null) continue;
+                TreeItemBase tib = item as TreeItemBase;
+                treevm.tviDic.TryAdd(tib.id, tvi);
+
+                if (item.GetType() == typeof(Cust))
+                {
+                    Cust cust = (Cust)item;
+                    if (cust.carsize == 0) 
+                        continue;
+                    tvi.IsExpanded = true;
+                    tvi.UpdateLayout();
+                    c(tvi.ItemContainerGenerator, expand);
+                }
+            }
+        }
+
     }
-
-
 }

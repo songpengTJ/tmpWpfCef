@@ -21,16 +21,18 @@
         <TreeView Grid.Column="0" x:Name="trvFamilies" 
                   ItemsSource="{Binding listTreeNodes}" 
                   SelectedValuePath="id"
+                  
                  >
             <i:Interaction.Behaviors>
                 <local:BindableSelectedItemBehavior SelectedItem="{Binding SelectedTreeItem}" />
             </i:Interaction.Behaviors>
-            
+
+
+
             <TreeView.Resources>
                 <HierarchicalDataTemplate DataType="{x:Type self:Cust}" ItemsSource="{Binding Members}" >
                     <StackPanel Orientation="Horizontal" >
                         <CheckBox  IsChecked="{Binding IsSelected}"  />
-                        <Image Source="{Binding ImageName}" Width="21" Height="21"  />
                         <TextBlock Text="{Binding Title}" />
                     </StackPanel>
                 </HierarchicalDataTemplate>
@@ -38,7 +40,6 @@
                 <DataTemplate DataType="{x:Type self:Car}"  >
                     <WrapPanel Orientation="Horizontal">
                         <CheckBox  IsChecked="{Binding IsSelected}"  />
-                        <Image Source="{Binding ImageName}" Width="21" Height="21"  />
                         <TextBlock Text="{Binding Title}" />
                         <WrapPanel.ContextMenu>
                             <ContextMenu>
@@ -52,7 +53,30 @@
                         </WrapPanel.ContextMenu>
                     </WrapPanel>
                 </DataTemplate>
+
+                <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}"     Color="#1782ff"  />
+                <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightTextBrushKey}" Color="White"    />
+
             </TreeView.Resources>
+<!-- 
+            <TreeView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <local:MyVirtualizingStackPanel/>
+                </ItemsPanelTemplate>
+            </TreeView.ItemsPanel>
+            <TreeView.ItemContainerStyle>
+                <Style TargetType="TreeViewItem">
+                    <Setter Property="IsExpanded"  Value="True" />
+                    <Setter Property="ItemsPanel">
+                        <Setter.Value>
+                            <ItemsPanelTemplate>
+                                <local:MyVirtualizingStackPanel/>
+                            </ItemsPanelTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </TreeView.ItemContainerStyle>
+-->
         </TreeView>
         
         <!--Splitter-->
@@ -65,7 +89,7 @@
                 <RowDefinition Height="300"></RowDefinition>
             </Grid.RowDefinitions>
 
-            <StackPanel Grid.Row="1">
+            <StackPanel Grid.Row="0">
 
                 <TextBlock Margin="10">SelectedValuePath:</TextBlock>
                 <TextBlock Margin="10,0,0,0" 
