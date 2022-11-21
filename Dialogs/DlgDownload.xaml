@@ -1,0 +1,19 @@
+﻿<Window x:Class="WpfCef.Dialogs.DlgDownload"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Topmost="True"
+        Title="DlgDownload" Height="120" Width="400" WindowStyle="None" WindowStartupLocation="CenterScreen">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <Label       Margin="3" Content="{Binding DownloadTitle}"  FontSize="16" FontWeight="Bold" ></Label>
+        <ProgressBar Margin="5,8,5,8" Grid.Row="1" Value="{Binding ProgressValue}" ></ProgressBar>
+        <TextBox x:Name="TBRet" Visibility="Hidden" Text="{Binding ret}" TextChanged="TextBox_TextChanged" ></TextBox>
+    </Grid>
+</Window>

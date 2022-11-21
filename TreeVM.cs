@@ -39,8 +39,8 @@ namespace WpfCef
                 string parentid = p.qryParentId();
                 if (!dic.ContainsKey(parentid))
                     return;
-                if (p.carsize > 0)
-                    dic[parentid].Members.Add(p);
+                //if (p.carsize > 0)
+                dic[parentid].Members.Add(p);
             });
 
             Tool.pack.data.cars.ForEach(delegate (Car p) {
@@ -55,11 +55,24 @@ namespace WpfCef
             Tool.pack.data.cars.ForEach(p => {
                 p.PropertyChanged += delegate (object sender, System.ComponentModel.PropertyChangedEventArgs e)
                 {
-                    if (!e.PropertyName.Equals("IsSelected")) 
+                    if (!e.PropertyName.Equals("IsSelected"))
                         return;
                     OnPropertyChanged("ListCars");
                 };
             });
+        }
+
+        public int calNodeCount() {
+            return calNodeCount(_rootNode);
+        }
+        public int calNodeCount(TreeItemBase itm) {
+            int _icount = 1;
+            if(itm.Members!=null)
+            for (int i = 0; i < itm.Members.Count; i++) {
+                TreeItemBase subitm = itm.Members[i];
+                _icount += calNodeCount(subitm);
+            }
+            return _icount;
         }
 
         public ObservableCollection<TreeItemBase> listTreeNodes
@@ -141,20 +154,20 @@ namespace WpfCef
             // TreeView
             if (bTV)
             {
+                /*
                 TreeViewItem tvi2 = ContainerFromItem(tv.ItemContainerGenerator, car);
                 if (tvi2 != null) 
                 {
                     tvi2.BringIntoView();
                     tvi2.IsSelected = true;
                 }
-                /*
+                */                
                 if (tviDic.ContainsKey(car.id))
                 {
                     TreeViewItem tvi = tviDic[car.id];
                     tvi.BringIntoView();
                     tvi.IsSelected = true;
                 }
-                */
             }
             // GridPos
             if (bGRID && car.IsSelected)
@@ -173,141 +186,50 @@ namespace WpfCef
             }
         }
 
-
         /// <summary>
-        /// Recursively search for an item in this subtree.
+        ///  递归扫描TREEVIEW节点
         /// </summary>
-        /// <param name="container">
-        /// The parent ItemsControl. This can be a TreeView or a TreeViewItem.
-        /// </param>
-        /// <param name="item">
-        /// The item to search for.
-        /// </param>
-        /// <returns>
-        /// The TreeViewItem that contains the specified item.
-        /// </returns>
-        private TreeViewItem GetTreeViewItem(ItemsControl container, object item)
+        /// <param name="icg"></param>
+        /// <param name="expand"></param>
+        public void scanTreeViewItems(ItemContainerGenerator icg, bool isExpanded ,bool isGoon)
         {
-            if (container != null)
+            if (icg == null) return;
+            foreach (object item in icg.Items)
             {
-                if (container.DataContext == item)
+                var tvi = icg.ContainerFromItem(item) as TreeViewItem;
+                if (tvi == null) continue;
+                var tib = item as TreeItemBase;
+                if (tib == null || tib.id == null) continue;
+                tviDic.TryAdd(tib.id, tvi);
+
+                if (item.GetType() == typeof(Cust))
                 {
-                    return container as TreeViewItem;
-                }
-
-                // Expand the current container
-                if (container is TreeViewItem && !((TreeViewItem)container).IsExpanded)
-                {
-                    container.SetValue(TreeViewItem.IsExpandedProperty, true);
-                }
-
-                // Try to generate the ItemsPresenter and the ItemsPanel.
-                // by calling ApplyTemplate.  Note that in the
-                // virtualizing case even if the item is marked
-                // expanded we still need to do this step in order to
-                // regenerate the visuals because they may have been virtualized away.
-
-                container.ApplyTemplate();
-                ItemsPresenter itemsPresenter =
-                    (ItemsPresenter)container.Template.FindName("ItemsHost", container);
-                if (itemsPresenter != null)
-                {
-                    itemsPresenter.ApplyTemplate();
-                }
-                else
-                {
-                    // The Tree template has not named the ItemsPresenter,
-                    // so walk the descendents and find the child.
-                    itemsPresenter = FindVisualChild<ItemsPresenter>(container);
-                    if (itemsPresenter == null)
-                    {
-                        container.UpdateLayout();
-
-                        itemsPresenter = FindVisualChild<ItemsPresenter>(container);
-                    }
-                }
-
-                Panel itemsHostPanel = (Panel)VisualTreeHelper.GetChild(itemsPresenter, 0);
-
-                // Ensure that the generator for this panel has been created.
-                UIElementCollection children = itemsHostPanel.Children;
-
-                MyVirtualizingStackPanel virtualizingPanel =
-                    itemsHostPanel as MyVirtualizingStackPanel;
-
-                for (int i = 0, count = container.Items.Count; i < count; i++)
-                {
-                    TreeViewItem subContainer;
-                    if (virtualizingPanel != null)
-                    {
-                        // Bring the item into view so
-                        // that the container will be generated.
-                        virtualizingPanel.BringIntoView(i);
-
-                        subContainer =
-                            (TreeViewItem)container.ItemContainerGenerator.
-                            ContainerFromIndex(i);
-                    }
-                    else
-                    {
-                        subContainer =
-                            (TreeViewItem)container.ItemContainerGenerator.
-                            ContainerFromIndex(i);
-
-                        // Bring the item into view to maintain the
-                        // same behavior as with a virtualizing panel.
-                        subContainer.BringIntoView();
-                    }
-
-                    if (subContainer != null)
-                    {
-                        // Search the next level for the object.
-                        TreeViewItem resultContainer = GetTreeViewItem(subContainer, item);
-                        if (resultContainer != null)
-                        {
-                            return resultContainer;
-                        }
-                        else
-                        {
-                            // The object is not under this TreeViewItem
-                            // so collapse it.
-                            subContainer.IsExpanded = false;
-                        }
-                    }
+                    Cust cust = (Cust)item;
+                    if (cust.carsize == 0)
+                        continue;
+                    tvi.IsExpanded = isExpanded;
+                    tvi.UpdateLayout();
+                    
+                    if(isGoon)//是否递归
+                        scanTreeViewItems(tvi.ItemContainerGenerator, isExpanded,isGoon);
                 }
             }
-
-            return null;
         }
 
-        /// <summary>
-        /// Search for an element of a certain type in the visual tree.
-        /// </summary>
-        /// <typeparam name="T">The type of element to find.</typeparam>
-        /// <param name="visual">The parent element.</param>
-        /// <returns></returns>
-        private T FindVisualChild<T>(Visual visual) where T : Visual
-        {
-            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(visual); i++)
-            {
-                Visual child = (Visual)VisualTreeHelper.GetChild(visual, i);
-                if (child != null)
-                {
-                    T correctlyTyped = child as T;
-                    if (correctlyTyped != null)
-                    {
-                        return correctlyTyped;
-                    }
-
-                    T descendent = FindVisualChild<T>(child);
-                    if (descendent != null)
-                    {
-                        return descendent;
-                    }
-                }
+        private string _kwvid;
+        public string kwvid { get => _kwvid;
+            set {
+                _kwvid = value;
+                CmdFilterCars();
             }
+        }
+        public List<Car> FilterCars { get; set; }
 
-            return null;
+        public void CmdFilterCars() {
+            FilterCars = Tool.pack.data.cars.Where(p =>{
+                return p.vid.Contains(kwvid); 
+            }).OrderBy(p => p.vid).Take(10).ToList();
+            OnPropertyChanged("FilterCars");
         }
 
     }

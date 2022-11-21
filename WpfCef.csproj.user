@@ -12,6 +12,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Page Update="Dialogs\DlgDownload.xaml">
+      <SubType>Designer</SubType>
+    </Page>
     <Page Update="Tree.xaml">
       <SubType>Designer</SubType>
     </Page>

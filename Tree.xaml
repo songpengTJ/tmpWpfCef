@@ -13,21 +13,17 @@
     <Grid>
         <Grid.ColumnDefinitions>
             <!--Resources TreeView-->
-            <ColumnDefinition Width="250" MaxWidth="400" MinWidth="200" />
+            <ColumnDefinition Width="250" MaxWidth="600" MinWidth="200" />
             <!--Main Content-->
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
         <TreeView Grid.Column="0" x:Name="trvFamilies" 
                   ItemsSource="{Binding listTreeNodes}" 
-                  SelectedValuePath="id"
-                  
-                 >
+                  SelectedValuePath="id" >
             <i:Interaction.Behaviors>
                 <local:BindableSelectedItemBehavior SelectedItem="{Binding SelectedTreeItem}" />
             </i:Interaction.Behaviors>
-
-
 
             <TreeView.Resources>
                 <HierarchicalDataTemplate DataType="{x:Type self:Cust}" ItemsSource="{Binding Members}" >
@@ -43,10 +39,10 @@
                         <TextBlock Text="{Binding Title}" />
                         <WrapPanel.ContextMenu>
                             <ContextMenu>
-                                <MenuItem Header="轨迹回放" Command="{Binding MiCmdPlayTrack}" />
+                                <MenuItem Header="轨迹回放" Command="{Binding MiCmdPlayTrack}"    />
                                 <MenuItem Header="视频监控" Command="{Binding MiCmdVideoMonitor}" />
-                                <MenuItem Header="油耗查询" Command="{Binding MiCmdPlayOil}" />
-                                <MenuItem Header="指令下发" Command="{Binding MiCmdSendCommand}" />
+                                <MenuItem Header="油耗查询" Command="{Binding MiCmdPlayOil}"      />
+                                <MenuItem Header="指令下发" Command="{Binding MiCmdSendCommand}"  />
                                 <Separator Height="5"/>
                                 <MenuItem Header="车辆信息" />
                             </ContextMenu>
@@ -58,25 +54,6 @@
                 <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightTextBrushKey}" Color="White"    />
 
             </TreeView.Resources>
-<!-- 
-            <TreeView.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <local:MyVirtualizingStackPanel/>
-                </ItemsPanelTemplate>
-            </TreeView.ItemsPanel>
-            <TreeView.ItemContainerStyle>
-                <Style TargetType="TreeViewItem">
-                    <Setter Property="IsExpanded"  Value="True" />
-                    <Setter Property="ItemsPanel">
-                        <Setter.Value>
-                            <ItemsPanelTemplate>
-                                <local:MyVirtualizingStackPanel/>
-                            </ItemsPanelTemplate>
-                        </Setter.Value>
-                    </Setter>
-                </Style>
-            </TreeView.ItemContainerStyle>
--->
         </TreeView>
         
         <!--Splitter-->
@@ -93,11 +70,17 @@
 
                 <TextBlock Margin="10">SelectedValuePath:</TextBlock>
                 <TextBlock Margin="10,0,0,0" 
-           Text="{Binding ElementName=trvFamilies, 
-                          Path=SelectedValuePath}"
-           Foreground="Blue"/>
-               
-                <Button Content="INIT TV" Click="Button_Click" /> 
+                    Text="{Binding ElementName=trvFamilies,Path=SelectedValuePath}"
+                    Foreground="Blue"/>
+
+                <TextBox  Text="{Binding kwvid}" ></TextBox>
+                <Button Content="查询车辆" Click="Button_Click" />
+                <ListBox x:Name="cmbvidlist" ItemsSource="{Binding Path=FilterCars}"
+                         DisplayMemberPath="vid"
+                         SelectedItem="{Binding SelectedRTGridCar}"
+                         >
+                    
+                </ListBox>
 
                 <TextBlock Margin="10">SelectedValue:</TextBlock>
                 <TextBlock Margin="10,0,0,0" 
@@ -125,7 +108,6 @@
                       MaxHeight="1600"
                       VirtualizingStackPanel.VirtualizationMode="Recycling"   
                       VirtualizingPanel.IsVirtualizingWhenGrouping="True"
-                      
                       SelectedItem="{Binding Path=SelectedRTGridCar, Mode=TwoWay}"
                 >
                 <DataGrid.Resources>
