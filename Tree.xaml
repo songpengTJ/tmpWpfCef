@@ -18,7 +18,29 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <TreeView Grid.Column="0" x:Name="trvFamilies" 
+        <Grid Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="30" />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+
+            <ComboBox Grid.Row="0" x:Name="cmbvidlist" 
+                         IsEditable="True" 
+                         IsTextSearchEnabled="False"
+                         Text="{Binding kwvid}"
+                         ItemsSource="{Binding Path=FilterCars}"
+                         DisplayMemberPath="Title"
+                         SelectedItem="{Binding SelectedTreeItem}"
+                         PreviewTextInput="Cb_OnPreviewTextInput"
+                         >
+                <ComboBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel />
+                    </ItemsPanelTemplate>
+                </ComboBox.ItemsPanel>
+            </ComboBox>
+            
+            <TreeView Grid.Row="1" x:Name="trvFamilies" 
                   ItemsSource="{Binding listTreeNodes}" 
                   SelectedValuePath="id" >
             <i:Interaction.Behaviors>
@@ -55,7 +77,8 @@
 
             </TreeView.Resources>
         </TreeView>
-        
+
+        </Grid>
         <!--Splitter-->
         <GridSplitter ResizeDirection="Columns" Width="5"  ShowsPreview="True"/>
 
@@ -73,14 +96,9 @@
                     Text="{Binding ElementName=trvFamilies,Path=SelectedValuePath}"
                     Foreground="Blue"/>
 
-                <TextBox  Text="{Binding kwvid}" ></TextBox>
+
                 <Button Content="查询车辆" Click="Button_Click" />
-                <ListBox x:Name="cmbvidlist" ItemsSource="{Binding Path=FilterCars}"
-                         DisplayMemberPath="vid"
-                         SelectedItem="{Binding SelectedRTGridCar}"
-                         >
-                    
-                </ListBox>
+
 
                 <TextBlock Margin="10">SelectedValue:</TextBlock>
                 <TextBlock Margin="10,0,0,0" 

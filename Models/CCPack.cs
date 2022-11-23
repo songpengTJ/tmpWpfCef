@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace WpfCef.Models
@@ -15,7 +16,6 @@ namespace WpfCef.Models
         {
             public List<Car> cars { get; set; }
             public List<Cust> cust { get; set; }
-
             public Dictionary<string, string> cfgmap { get; set; }
         }
     }

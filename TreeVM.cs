@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.ConstrainedExecution;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -24,8 +25,9 @@ namespace WpfCef
 
         private TreeItemBase _rootNode;
         private ObservableCollection<TreeItemBase> _listTreeNode = new ObservableCollection<TreeItemBase>();
-        private void init() {
+        List<TreeItemBase> _listall = new List<TreeItemBase>();
 
+        private void init() {
             Tool.pack.data.cust = Tool.pack.data.cust.OrderBy(s => s.custcode).ToList();
             _rootNode = Tool.pack.data.cust.First();
             var dic = new Dictionary<string, TreeItemBase>();
@@ -51,6 +53,8 @@ namespace WpfCef
             });
 
             _listTreeNode.Add(_rootNode);
+            _listall.AddRange(Tool.pack.data.cars);
+            _listall.AddRange(Tool.pack.data.cust);
 
             Tool.pack.data.cars.ForEach(p => {
                 p.PropertyChanged += delegate (object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -91,10 +95,15 @@ namespace WpfCef
                 if(value == _SelectedTreeItem) 
                     return;
                 _SelectedTreeItem = value;
-                if (_SelectedTreeItem.GetType() == typeof(Car)) 
+                if (_SelectedTreeItem.GetType() == typeof(Car))
                 {
                     Car car = (Car)_SelectedTreeItem;
                     CarSelected(car, false, true);
+                }
+                else {
+                    TreeViewItem tvi = tviDic[_SelectedTreeItem.id];
+                    tvi.BringIntoView();
+                    tvi.IsSelected = true;
                 }
             } 
         }
@@ -115,32 +124,8 @@ namespace WpfCef
         public Dictionary<string, TreeViewItem> tviDic = new Dictionary<string, TreeViewItem>();
         public TreeView PageTV { get; set; }
         public DataGrid PageDG { get; set; }
-        private TreeViewItem ContainerFromItem(ItemContainerGenerator containerGenerator, object item)
-        {
-            TreeViewItem container = (TreeViewItem)containerGenerator.ContainerFromItem(item);
-            if (container != null)
-                return container;
 
-            foreach (object childItem in containerGenerator.Items)
-            {
-                TreeViewItem parent = containerGenerator.ContainerFromItem(childItem) as TreeViewItem;
-                if (parent == null)
-                    continue;
-
-                container = parent.ItemContainerGenerator.ContainerFromItem(item) as TreeViewItem;
-                if (container != null)
-                    return container;
-
-                container = ContainerFromItem(parent.ItemContainerGenerator, item);
-                if (container != null)
-                    return container;
-            }
-            return null;
-        }
-
-        private void CarSelected(Car car
-            , bool bTV
-            , bool bGRID)
+        private void CarSelected(Car car ,bool bTV ,bool bGRID)
         { 
             CarSelected(car, bTV, bGRID, PageTV, PageDG);
         }
@@ -154,14 +139,6 @@ namespace WpfCef
             // TreeView
             if (bTV)
             {
-                /*
-                TreeViewItem tvi2 = ContainerFromItem(tv.ItemContainerGenerator, car);
-                if (tvi2 != null) 
-                {
-                    tvi2.BringIntoView();
-                    tvi2.IsSelected = true;
-                }
-                */                
                 if (tviDic.ContainsKey(car.id))
                 {
                     TreeViewItem tvi = tviDic[car.id];
@@ -223,12 +200,19 @@ namespace WpfCef
                 CmdFilterCars();
             }
         }
-        public List<Car> FilterCars { get; set; }
+        public List<TreeItemBase> FilterCars { get; set; }
 
         public void CmdFilterCars() {
-            FilterCars = Tool.pack.data.cars.Where(p =>{
-                return p.vid.Contains(kwvid); 
-            }).OrderBy(p => p.vid).Take(10).ToList();
+            
+
+
+            FilterCars = _listall.Where(p => {
+                return kwvid == null || p.Title.Contains(kwvid);
+            }).
+            OrderBy(p => p.Title).Take(20).ToList();
+
+
+
             OnPropertyChanged("FilterCars");
         }
 

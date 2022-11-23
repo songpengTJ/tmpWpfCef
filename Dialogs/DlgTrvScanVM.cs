@@ -77,6 +77,7 @@ namespace WpfCef.Dialogs
                     
                     Application.Current.Dispatcher.Invoke( delegate(){
                         tvi.IsExpanded = isExpanded;
+                        //tvi.ExpandSubtree();
                         tvi.UpdateLayout();
                     });
 

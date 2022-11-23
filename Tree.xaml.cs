@@ -1,5 +1,10 @@
-﻿using System.Windows;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
 using WpfCef.Dialogs;
+using WpfCef.Models;
 
 namespace WpfCef
 {
@@ -41,7 +46,33 @@ namespace WpfCef
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            treevm.CmdFilterCars();
+            scanTreeViewItems(trvFamilies.ItemContainerGenerator, false, true);
+            scanTreeViewItems(trvFamilies.ItemContainerGenerator, true, false);
         }
+        private void Cb_OnPreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+            cmbvidlist.IsDropDownOpen = true;
+        }
+
+        private void scanTreeViewItems(ItemContainerGenerator icg, bool isExpanded, bool isGoon)
+        {
+            if (icg == null) return;
+            foreach (object item in icg.Items)
+            {
+                var tvi = icg.ContainerFromItem(item) as TreeViewItem;
+                if (tvi == null) continue;
+                if (item.GetType() == typeof(Cust))
+                {
+                    Cust cust = (Cust)item;
+                    if (cust.carsize == 0)
+                        continue;
+                    tvi.IsExpanded = isExpanded;
+                    tvi.UpdateLayout();
+                    if (isGoon)//是否递归
+                        scanTreeViewItems(tvi.ItemContainerGenerator, isExpanded, isGoon);
+                }
+            }
+        }
+    
     }
 }
